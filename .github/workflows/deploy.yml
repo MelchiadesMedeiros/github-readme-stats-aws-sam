@@ -22,7 +22,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Serverless Build
-        run: sam build --use-container
+        run: sam build
       - name: Serverless Deploy
-        run: sam deploy --config-env ${{ github.ref_name }}
+        run: sam deploy --config-env ${{ github.ref_name }} --parameter-overrides githubToken=${{ secrets.GITHUB_TOKEN }}
   
