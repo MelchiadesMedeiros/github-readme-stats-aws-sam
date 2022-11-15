@@ -1,0 +1,12 @@
+version = 0.1
+
+[develop]
+[develop.deploy]
+[develop.deploy.parameters]
+stack_name = "github-readme-stats-develop"
+s3_bucket = "github-readme-stats"
+s3_prefix = "develop"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "stage=\"develop\""
+image_repositories = []

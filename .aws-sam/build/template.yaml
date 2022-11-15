@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Sample SAM Template for aws-sam-cli nodejs16.x runtime Github Readme
+  Stats
+
+  '
+Parameters:
+  stage:
+    Description: Stage name
+    Type: String
+    Default: develop
+    AllowedValues:
+    - master
+    - staging
+    - develop
+Resources:
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description:
+        Fn::Sub: Github Readme Stats - ${stage}
+      FunctionName:
+        Fn::Sub: github-readme-stats-${stage}
+      CodeUri: LambdaFunction
+      Handler: index.handler
+      Runtime: nodejs16.x
+      MemorySize: 128
+      Timeout: 30
+      Role:
+        Fn::GetAtt:
+        - LambdaEdgeIAMRole
+        - Arn
+      AutoPublishAlias: live
+      FunctionUrlConfig:
+        AuthType: NONE
+    Metadata:
+      SamResourceId: LambdaFunction
+  LambdaEdgeIAMRole:
+    Type: AWS::IAM::Role
+    Description: Github Readme Stats Lambda Edge IAM Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: AllowLambdaServiceToAssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - edgelambda.amazonaws.com
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+      Path: /
+      Policies:
+      - PolicyName: PublishNewLambdaEdgeVersion
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - lambda:PublishVersion
+            Resource: '*'
+Outputs:
+  LambdaFunction:
+    Description: Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - LambdaFunction
+      - Arn
